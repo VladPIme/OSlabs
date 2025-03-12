@@ -1,0 +1,5 @@
+﻿  pch.cpp
+  test.cpp
+test.obj : error LNK2019: ссылка на неразрешенный внешний символ "unsigned long __cdecl MinMaxThread(void *)" (?MinMaxThread@@YAKPEAX@Z) в функции "private: virtual void __cdecl ThreadTest_MinMaxThreadTest_Test::TestBody(void)" (?TestBody@ThreadTest_MinMaxThreadTest_Test@@EEAAXXZ).
+test.obj : error LNK2019: ссылка на неразрешенный внешний символ "unsigned long __cdecl AverageThread(void *)" (?AverageThread@@YAKPEAX@Z) в функции "private: virtual void __cdecl ThreadTest_AverageThreadTest_Test::TestBody(void)" (?TestBody@ThreadTest_AverageThreadTest_Test@@EEAAXXZ).
+D:\Works\2course\OS\x64\Debug\Test.exe : fatal error LNK1120: неразрешенных внешних элементов: 2

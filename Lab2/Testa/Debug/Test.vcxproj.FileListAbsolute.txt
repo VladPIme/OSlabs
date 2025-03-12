@@ -1,0 +1,4 @@
+D:\Works\2course\OS\Lab2a\Test\Debug\Test.vcxproj.CopyComplete
+D:\Works\2course\OS\Lab2a\Test\Debug\Test.exe
+D:\Works\2course\OS\Lab2a\Test\Debug\gtest.pdb
+D:\Works\2course\OS\Lab2a\Test\Debug\gtest_main.pdb
