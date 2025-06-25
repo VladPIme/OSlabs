@@ -7,7 +7,7 @@
 ### Запуск лабораторной работы:
 
 ```bash
-git clone https://github.com/kensh911/OSlabs.git
+git clone https://github.com/VkadPIme/OSlabs.git
 cd OSlabs/Lab1
 make
 ```
