@@ -1,104 +1,77 @@
-п»їcmake_minimum_required(VERSION 3.14)
-project(ThreadsProject CXX)
+cmake_minimum_required(VERSION 3.10)
+project(ThreadProcessing)
 
-set(CMAKE_CXX_STANDARD 17)
+# Включаем поддержку C++11
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# ---------- WinAPI РІРµСЂСЃРёСЏ (Lab2) ----------
+# Установка пути для выходных файлов
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# РЎРѕР·РґР°РµРј Р±РёР±Р»РёРѕС‚РµРєСѓ РґР»СЏ WinAPI РІРµСЂСЃРёРё
-add_library(WinAPIThreadLib
-    Lab2/ThreadProcessing.cpp
-)
-
-target_include_directories(WinAPIThreadLib
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Lab2
-)
-
-# Р”Р»СЏ Windows РЅСѓР¶РЅР° Р±РёР±Р»РёРѕС‚РµРєР° Kernel32
-if(WIN32)
-    target_link_libraries(WinAPIThreadLib PRIVATE Kernel32)
+# Опции компиляции
+if(MSVC)
+    # Для Visual Studio
+    add_compile_options(/W4)
+else()
+    # Для GCC/Clang
+    add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# РћСЃРЅРѕРІРЅРѕРµ РїСЂРёР»РѕР¶РµРЅРёРµ WinAPI
-add_executable(Lab2_WinAPI_Main Lab2/Main.cpp)
-
-target_include_directories(Lab2_WinAPI_Main
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Lab2
+# Включаем исходные файлы основного проекта
+set(MAIN_SRC
+    ${CMAKE_SOURCE_DIR}/Main/Исходные\ файлы/Main.cpp
+    ${CMAKE_SOURCE_DIR}/Main/Исходные\ файлы/ThreadProcessing.h
 )
 
-target_link_libraries(Lab2_WinAPI_Main PRIVATE WinAPIThreadLib)
+# Основной исполняемый файл
+add_executable(ThreadProcessor ${MAIN_SRC})
 
-# ---------- std::thread РІРµСЂСЃРёСЏ (Lab2a) ----------
+# Поиск Google Test
+find_package(GTest QUIET)
+if(NOT GTest_FOUND)
+    # Если Google Test не найден, загружаем его вручную
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.12.1
+    )
+    # Для более старых версий CMake
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+endif()
 
-# РЎРѕР·РґР°РµРј Р±РёР±Р»РёРѕС‚РµРєСѓ РґР»СЏ std::thread РІРµСЂСЃРёРё
-add_library(StdThreadLib
-    Lab2a/ThreadProcessing.cpp
+# Создаем библиотеку для тестирования
+add_library(ThreadProcessingLib STATIC
+    ${CMAKE_SOURCE_DIR}/Main/Исходные\ файлы/Main.cpp
+)
+target_include_directories(ThreadProcessingLib PUBLIC
+    ${CMAKE_SOURCE_DIR}/Main/Исходные\ файлы
 )
 
-target_include_directories(StdThreadLib
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Lab2a
-)
-
-target_compile_features(StdThreadLib PRIVATE cxx_std_17)
-
-# РћСЃРЅРѕРІРЅРѕРµ РїСЂРёР»РѕР¶РµРЅРёРµ std::thread
-add_executable(Lab2_StdThread_Main Lab2a/Main.cpp)
-
-target_include_directories(Lab2_StdThread_Main
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Lab2a
-)
-
-target_compile_features(Lab2_StdThread_Main PRIVATE cxx_std_17)
-target_link_libraries(Lab2_StdThread_Main PRIVATE StdThreadLib)
-
-# ---------- РќР°СЃС‚СЂРѕР№РєР° Google Test ----------
-
-include(FetchContent)
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
+# Включаем тесты
 enable_testing()
 
-# ---------- РўРµСЃС‚С‹ РґР»СЏ WinAPI РІРµСЂСЃРёРё ----------
-
-add_executable(Lab2_WinAPI_Tests
-    Test/test_winapi.cpp
-    Test/pch.cpp
+# Исходные файлы для тестов
+set(TEST_SRC
+    ${CMAKE_SOURCE_DIR}/Test/pch.cpp
+    ${CMAKE_SOURCE_DIR}/Test/pch.h
+    ${CMAKE_SOURCE_DIR}/Test/test.cpp
 )
 
-target_include_directories(Lab2_WinAPI_Tests
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Test
-        ${CMAKE_CURRENT_SOURCE_DIR}/Lab2
+# Исполняемый файл для тестов
+add_executable(ThreadProcessingTests ${TEST_SRC})
+target_link_libraries(ThreadProcessingTests PRIVATE 
+    ThreadProcessingLib 
+    GTest::gtest 
+    GTest::gtest_main
+)
+target_include_directories(ThreadProcessingTests PRIVATE
+    ${CMAKE_SOURCE_DIR}/Main/Исходные\ файлы
 )
 
-target_link_libraries(Lab2_WinAPI_Tests PRIVATE WinAPIThreadLib gtest_main)
-
-add_test(NAME Lab2_WinAPI_Tests COMMAND Lab2_WinAPI_Tests)
-
-# ---------- РўРµСЃС‚С‹ РґР»СЏ std::thread РІРµСЂСЃРёРё ----------
-
-add_executable(Lab2_StdThread_Tests
-    Testa/test_thread.cpp
-    Testa/pch.cpp
-)
-
-target_include_directories(Lab2_StdThread_Tests
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Testa
-        ${CMAKE_CURRENT_SOURCE_DIR}/Lab2a
-)
-
-target_compile_features(Lab2_StdThread_Tests PRIVATE cxx_std_17)
-target_link_libraries(Lab2_StdThread_Tests PRIVATE StdThreadLib gtest_main)
-
-add_test(NAME Lab2_StdThread_Tests COMMAND Lab2_StdThread_Tests)
+# Автоматический поиск тестов и добавление к CTest
+include(GoogleTest)
+gtest_discover_tests(ThreadProcessingTests)
